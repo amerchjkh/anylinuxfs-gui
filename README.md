@@ -28,10 +28,20 @@ A macOS GUI application for [anylinuxfs](https://github.com/nohajc/anylinuxfs) -
 ### Homebrew (recommended)
 
 ```bash
-brew install fenio/tap/anylinuxfs-gui
+brew tap nohajc/anylinuxfs
+brew tap fenio/tap
+brew trust --formula nohajc/anylinuxfs/anylinuxfs
+brew trust --cask fenio/tap/anylinuxfs-gui
+brew install --cask fenio/tap/anylinuxfs-gui
 ```
 
 This will automatically install the [anylinuxfs CLI](https://github.com/nohajc/anylinuxfs) dependency.
+
+The upstream tap must be added explicitly on a fresh installation: Homebrew does not
+automatically tap third-party formula dependencies. Review the two repositories before
+granting trust; the commands above trust only the required formula and cask, not whole
+taps or unrelated packages. On older Homebrew versions without `brew trust`, omit those
+two commands or update Homebrew. Do not run `brew install` with sudo.
 
 If you get "damaged" or Gatekeeper warnings, run:
 ```bash
