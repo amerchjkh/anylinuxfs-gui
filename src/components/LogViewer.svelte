@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { logs, type LogLine } from '#lib/stores/logs';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -74,7 +75,7 @@
 
 <div class="log-viewer">
 	<div class="header">
-		<h2>Logs</h2>
+		<h2>{$t('Logs')}</h2>
 		<div class="controls">
 			{#if $logs.logFiles.length > 0}
 				<select
@@ -82,29 +83,29 @@
 					value={$logs.selectedFile || ''}
 					onchange={(e) => logs.selectFile((e.target as HTMLSelectElement).value || null)}
 				>
-					<option value="">All sessions</option>
+					<option value="">{$t('All sessions')}</option>
 					{#each [...$logs.logFiles].reverse() as file}
 						<option value={file.path}>{file.label || file.name}{file.timestamp ? ` — ${file.timestamp}` : ''}</option>
 					{/each}
 				</select>
 			{/if}
-			<span class="line-count">{$logs.lines.length} lines</span>
+			<span class="line-count">{$t('{count} lines', { count: $logs.lines.length })}</span>
 			<label class="follow-toggle">
 				<input
 					type="checkbox"
 					checked={$logs.following}
 					onchange={(e) => logs.setFollowing((e.target as HTMLInputElement).checked)}
 				/>
-				Auto-scroll
+				{$t('Auto-scroll')}
 			</label>
-			<button class="btn-small" onclick={() => logs.clear()}>Clear</button>
-			<button class="btn-small" onclick={() => logs.load()}>Reload</button>
+			<button class="btn-small" onclick={() => logs.clear()}>{$t('Clear')}</button>
+			<button class="btn-small" onclick={() => logs.load()}>{$t('Reload')}</button>
 		</div>
 	</div>
 
 	{#if $logs.error}
 		<div class="error-banner" role="alert">
-			<span>{$logs.error}</span>
+			<span>{$t($logs.error || '')}</span>
 		</div>
 	{/if}
 
@@ -114,9 +115,9 @@
 		onscroll={handleScroll}
 	>
 		{#if $logs.loading}
-			<div class="loading">Loading logs...</div>
+			<div class="loading">{$t('Loading logs...')}</div>
 		{:else if $logs.lines.length === 0}
-			<div class="empty">No log entries yet.</div>
+			<div class="empty">{$t('No log entries yet.')}</div>
 		{:else}
 			<!-- Virtual scroll container -->
 			<div class="virtual-scroll" style="height: {totalHeight}px;">
@@ -138,7 +139,7 @@
 
 	{#if !$logs.following && $logs.lines.length > 0}
 		<button class="scroll-to-bottom" onclick={scrollToBottom}>
-			Scroll to bottom
+			{$t('Scroll to bottom')}
 		</button>
 	{/if}
 </div>

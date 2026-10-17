@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import type { Partition } from '#lib/types';
 	import { disks } from '#lib/stores/disks';
 	import { elevation } from '#lib/stores/elevation';
@@ -216,13 +217,13 @@
 			<div class="partition-device">
 				<span class="device-name">{partition.device}</span>
 				{#if partition.encrypted}
-					<span class="encrypted-badge" title="Encrypted">Encrypted</span>
+					<span class="encrypted-badge" title={$t('Encrypted')}>{$t('Encrypted')}</span>
 				{/if}
 				{#if partition.mounted_by_system}
-					<span class="mounted-badge" title="Already mounted by macOS">Mounted</span>
+					<span class="mounted-badge" title={$t('Already mounted by macOS')}>{$t('Mounted')}</span>
 				{/if}
 				{#if !partition.supported && !partition.support_note}
-					<span class="unsupported-badge">Unsupported</span>
+					<span class="unsupported-badge">{$t('Unsupported')}</span>
 				{/if}
 			</div>
 			<div class="partition-details">
@@ -237,37 +238,37 @@
 			</div>
 			{#if (extraOptions || ignorePermissions) && !showOptions && !isUnavailable}
 				<div class="saved-options" title={[ignorePermissions ? '--ignore-permissions' : '', extraOptions].filter(Boolean).join(' ')}>
-					<span class="saved-options-label">opts:</span> {[ignorePermissions ? '--ignore-permissions' : '', extraOptions].filter(Boolean).join(' ')}
+					<span class="saved-options-label">{$t('opts:')}</span> {[ignorePermissions ? '--ignore-permissions' : '', extraOptions].filter(Boolean).join(' ')}
 				</div>
 			{/if}
 		</div>
 		{#if partition.mounted_by_system}
-			<span class="status-note">In use by macOS</span>
+			<span class="status-note">{$t('In use by macOS')}</span>
 		{:else if !partition.supported}
-			<span class="status-note" title={partition.support_note || ''}>{partition.support_note || 'Unsupported filesystem'}</span>
+			<span class="status-note" title={$t(partition.support_note || '')}>{$t(partition.support_note || 'Unsupported filesystem')}</span>
 		{:else}
 			<div class="mount-controls">
-				<label class="ro-toggle" title="Mount read-only">
+				<label class="ro-toggle" title={$t('Mount read-only')}>
 					<input
 						type="checkbox"
 						checked={readOnly()}
 						onchange={toggleReadOnly}
 						disabled={mounting || alreadyMounted || $elevation.loading || $elevation.saving}
 					/>
-					<span>RO</span>
+					<span>{$t('RO')}</span>
 				</label>
 				<div class="split-btn">
 					<button
 						class="mount-btn"
 						onclick={handleMount}
 						disabled={mounting || alreadyMounted || !!optionsError || $elevation.loading || $elevation.saving}
-						title={alreadyMounted ? 'Already mounted' : 'Mount this partition'}
+						title={alreadyMounted ? $t('Already mounted') : $t('Mount this partition')}
 					>
 						{#if mounting}
 							<span class="spinner"></span>
-							{discoveringSubvolumes ? 'Discovering…' : $elevation.policy.mode === 'interactive_terminal' ? 'Waiting in Terminal…' : 'Mounting…'}
+							{discoveringSubvolumes ? $t('Discovering…') : $elevation.policy.mode === 'interactive_terminal' ? $t('Waiting in Terminal…') : $t('Mounting…')}
 						{:else}
-							Mount
+							{$t('Mount')}
 						{/if}
 					</button>
 					<button
@@ -275,13 +276,13 @@
 						class:active={showOptions}
 						onclick={() => (showOptions = !showOptions)}
 						disabled={mounting || alreadyMounted || $elevation.loading || $elevation.saving}
-						title="Mount options"
+						title={$t('Mount options')}
 					>+</button>
 				</div>
 			</div>
 		{/if}
 	</div>
-	{#if optionsError}<p class="option-notice" role="alert">{optionsError} Open <strong>+</strong> to edit the saved options.</p>{/if}
+	{#if optionsError}<p class="option-notice" role="alert">{$t(optionsError || '')} {$t('Open + to edit the saved options.')}</p>{/if}
 	{#if isBtrfs && !isUnavailable}
 		<BtrfsSubvolumePicker
 			{partition} options={extraOptions} mounted={alreadyMounted}
@@ -292,27 +293,27 @@
 	{#if showOptions && !isUnavailable}
 		<div class="options-panel">
 			{#if family === 'zfs'}
-				<p class="option-notice">RO imports the ZFS pool read-only. Other Linux mount options are not applied to ZFS datasets. Dataset properties and snapshots are managed through the CLI.</p>
+				<p class="option-notice">{$t('RO imports the ZFS pool read-only. Other Linux mount options are not applied to ZFS datasets. Dataset properties and snapshots are managed through the CLI.')}</p>
 			{:else if family === 'unknown'}
-				<p class="option-notice">The inner filesystem is not known yet. Enable Admin mode for detection; custom option compatibility cannot be checked until its type is known.</p>
+				<p class="option-notice">{$t('The inner filesystem is not known yet. Enable Admin mode for detection; custom option compatibility cannot be checked until its type is known.')}</p>
 			{/if}
 			{#if partition.encrypted}
 				<label class="flag-toggle">
 					<input type="checkbox" bind:checked={btrfsInsideEncrypted} disabled={mounting || alreadyMounted} />
-					<span>Btrfs inside encrypted volume (show subvolumes)</span>
+					<span>{$t('Btrfs inside encrypted volume (show subvolumes)')}</span>
 				</label>
 			{/if}
 			<label class="flag-toggle">
 				<input type="checkbox" bind:checked={requestUnlock} disabled={mounting || alreadyMounted} />
-				<span>Unlock with passphrase or key file</span>
+				<span>{$t('Unlock with passphrase or key file')}</span>
 			</label>
-			<label class="flag-toggle" title="Bypass Unix file permissions: files appear owned by the current macOS user (--ignore-permissions)">
+			<label class="flag-toggle" title={$t('Bypass Unix file permissions: files appear owned by the current macOS user (--ignore-permissions)')}>
 				<input
 					type="checkbox"
 					bind:checked={ignorePermissions}
 					disabled={mounting || alreadyMounted}
 				/>
-				<span>Ignore permissions</span>
+				<span>{$t('Ignore permissions')}</span>
 			</label>
 			<input
 				class="options-input"
@@ -333,7 +334,7 @@
 						<button
 							class="chip-remove"
 							onclick={() => removeChip(chip)}
-							title="Remove option"
+							title={$t('Remove option')}
 						>&times;</button>
 					</span>
 				{/each}
@@ -344,14 +345,14 @@
 						bind:value={newChipValue}
 						onkeydown={handleAddChipKeydown}
 						onblur={addChip}
-						placeholder="option"
+						placeholder={$t('option')}
 						use:focusOnMount
 					/>
 				{:else}
 					<button
 						class="chip chip-add"
 						onclick={() => (addingChip = true)}
-						title="Add custom option"
+						title={$t('Add custom option')}
 					>+</button>
 				{/if}
 			</div>

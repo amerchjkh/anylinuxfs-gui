@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { status, isMounted } from '#lib/stores/status';
 	import { disks } from '#lib/stores/disks';
 	import { forceCleanup, setTrayUnmountEnabled } from '#lib/api';
@@ -44,8 +45,8 @@
 
 {#if error}
 	<div class="cleanup-error" role="alert">
-		<span class="error-message">Force cleanup failed: {error}</span>
-		<button class="dismiss-btn" onclick={() => (error = null)}>Dismiss</button>
+		<span class="error-message">{$t('Force cleanup failed:')} {$t(error || '')}</span>
+		<button class="dismiss-btn" onclick={() => (error = null)}>{$t('Dismiss')}</button>
 	</div>
 {/if}
 
@@ -54,10 +55,10 @@
 		<div class="mount-status mounted">
 			<div class="status-icon">
 				<span class="icon-mounted" aria-hidden="true"></span>
-				<span class="sr-only">Success</span>
+				<span class="sr-only">{$t('Success')}</span>
 			</div>
 			<div class="status-info">
-				<div class="status-label">Mounted</div>
+				<div class="status-label">{$t('Mounted')}</div>
 				<div class="status-details">
 					<span class="detail-item">{mount.device}</span>
 					<span class="detail-item">{mount.mount_point}</span>
@@ -71,7 +72,7 @@
 				onclick={() => handleUnmount(mount.device)}
 				disabled={unmountingDevices.has(mount.device)}
 			>
-				{unmountingDevices.has(mount.device) ? 'Unmounting...' : 'Unmount'}
+				{unmountingDevices.has(mount.device) ? $t('Unmounting...') : $t('Unmount')}
 			</button>
 		</div>
 	{/each}
@@ -82,10 +83,10 @@
 		<div class="mount-status mounting">
 			<div class="status-icon" role="status" aria-busy="true">
 				<span class="spinner" aria-hidden="true"></span>
-				<span class="sr-only">Loading</span>
+				<span class="sr-only">{$t('Loading')}</span>
 			</div>
 			<div class="status-info">
-				<div class="status-label">{$disks.mountingMessages.get(device) || 'Mounting…'}</div>
+				<div class="status-label">{$t($disks.mountingMessages.get(device) || 'Mounting…')}</div>
 				<div class="status-details">
 					<span class="detail-item">{device}</span>
 				</div>
@@ -96,7 +97,7 @@
 					onclick={() => handleCancelMount(device)}
 					disabled={$disks.mountingMessages.get(device)?.startsWith('Cancelling')}
 				>
-					{$disks.mountingMessages.get(device)?.startsWith('Cancelling') ? 'Cancelling…' : 'Cancel'}
+					{$disks.mountingMessages.get(device)?.startsWith('Cancelling') ? $t('Cancelling…') : $t('Cancel')}
 				</button>
 			{/if}
 		</div>
@@ -106,9 +107,9 @@
 {#if $status.mounts.length === 0 && $disks.mountingDevices.size === 0}
 	<div class="mount-status not-mounted">
 		<div class="status-info">
-			<div class="status-label">No disk mounted</div>
+			<div class="status-label">{$t('No disk mounted')}</div>
 			<div class="status-details">
-				<span class="detail-item">{$disks.disks.length > 0 ? 'Select a partition below to mount' : 'Connect a drive to get started'}</span>
+				<span class="detail-item">{$disks.disks.length > 0 ? $t('Select a partition below to mount') : $t('Connect a drive to get started')}</span>
 			</div>
 		</div>
 	</div>

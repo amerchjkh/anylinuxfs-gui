@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { config } from '#lib/stores/config';
 	import { onMount } from 'svelte';
 
@@ -55,26 +56,26 @@
 
 <div class="config-panel">
 	<div class="header">
-		<h2>Settings</h2>
+		<h2>{$t('Settings')}</h2>
 	</div>
 
 	{#if $config.error}
 		<div class="error-banner" role="alert">
-			<span>{$config.error}</span>
-			<button onclick={() => config.clearError()}>Dismiss</button>
+			<span>{$t($config.error || '')}</span>
+			<button onclick={() => config.clearError()}>{$t('Dismiss')}</button>
 		</div>
 	{/if}
 
 	{#if $config.loading}
-		<div class="loading">Loading configuration...</div>
+		<div class="loading">{$t('Loading configuration...')}</div>
 	{:else}
 		<div class="settings-grid">
 			<div class="setting-group">
-				<h3>Virtual Machine</h3>
-				<p class="description">Configure the Linux VM used to mount filesystems.</p>
+				<h3>{$t('Virtual Machine')}</h3>
+				<p class="description">{$t('Configure the Linux VM used to mount filesystems.')}</p>
 
 				<div class="setting">
-					<label for="ram">Memory (RAM)</label>
+					<label for="ram">{$t('Memory (RAM)')}</label>
 					<div class="input-with-unit">
 						<input
 							type="number"
@@ -87,11 +88,11 @@
 						/>
 						<span class="unit">MB</span>
 					</div>
-					<span class="hint">More RAM improves performance for large file operations.</span>
+					<span class="hint">{$t('More RAM improves performance for large file operations.')}</span>
 				</div>
 
 				<div class="setting">
-					<label for="vcpus">vCPUs</label>
+					<label for="vcpus">{$t('vCPUs')}</label>
 					<input
 						type="number"
 						id="vcpus"
@@ -100,26 +101,26 @@
 						min="1"
 						max="32"
 					/>
-					<span class="hint">More cores improve parallel file operations.</span>
+					<span class="hint">{$t('More cores improve parallel file operations.')}</span>
 				</div>
 			</div>
 
 			<div class="setting-group">
-				<h3>Logging</h3>
-				<p class="description">Configure logging verbosity.</p>
+				<h3>{$t('Logging')}</h3>
+				<p class="description">{$t('Configure logging verbosity.')}</p>
 
 				<div class="setting">
-					<label for="log-level">Log Level</label>
+					<label for="log-level">{$t('Log Level')}</label>
 					<select
 						id="log-level"
 						bind:value={logLevel}
 						onchange={checkChanges}
 					>
 						{#each logLevels as level}
-							<option value={level}>{level.charAt(0).toUpperCase() + level.slice(1)}</option>
+							<option value={level}>{$t(level.charAt(0).toUpperCase() + level.slice(1))}</option>
 						{/each}
 					</select>
-					<span class="hint">Higher verbosity generates more log output.</span>
+					<span class="hint">{$t('Higher verbosity generates more log output.')}</span>
 				</div>
 			</div>
 		</div>
@@ -130,7 +131,7 @@
 				onclick={handleReset}
 				disabled={!hasChanges || $config.saving}
 			>
-				Reset
+				{$t('Reset')}
 			</button>
 			<button
 				class="btn-primary"
@@ -138,9 +139,9 @@
 				disabled={!hasChanges || $config.saving}
 			>
 				{#if $config.saving}
-					Saving...
+					{$t('Saving...')}
 				{:else}
-					Save Changes
+					{$t('Save Changes')}
 				{/if}
 			</button>
 		</div>

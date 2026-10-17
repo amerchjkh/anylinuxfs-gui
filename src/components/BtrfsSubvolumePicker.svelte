@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import type { BtrfsSubvolumeList, Partition } from '#lib/types';
 	import { getMountStatus, listBtrfsSubvolumes, unmountDisk } from '#lib/api';
 	import { parseError } from '#lib/errors';
@@ -20,6 +21,7 @@
 	let data = $state<BtrfsSubvolumeList | null>(null);
 	let busy = $state(false);
 	let error = $state<string | null>(null);
+	let cleanupError = $state<string | null>(null);
 	let showUnlock = $state(false);
 	let submitting = $state(false);
 	let unlockError = $state<string | null>(null);
@@ -47,7 +49,7 @@
 				try {
 					await unmountDisk(partition.device);
 				} catch (e) {
-					error = `${error ? error + ' ' : ''}The temporary read-only mount could not be unmounted: ${parseError(e).message}. Unmount it before mounting your selection.`;
+					cleanupError = parseError(e).message;
 				}
 			}
 			status.refresh();
@@ -75,6 +77,7 @@
 	async function discover() {
 		if (busy || disabled) return;
 		error = null;
+		cleanupError = null;
 		unlockError = null;
 		setBusy(true);
 		try {
@@ -113,28 +116,29 @@
 
 <div class="btrfs-picker">
 	<label>
-		<span>Btrfs subvolume</span>
+		<span>{$t('Btrfs subvolume')}</span>
 		<select value={selected} onchange={select} disabled={disabled || busy || mounted}>
-			<option value="">Filesystem default{data ? ` (ID ${data.default_id})` : ''}</option>
-			<option value="subvolid=5">Top-level filesystem (ID 5)</option>
-			{#if !knownSelection}<option value={selected}>Custom: {selected}</option>{/if}
+			<option value="">{$t('Filesystem default')}{data ? ` (ID ${data.default_id})` : ''}</option>
+			<option value="subvolid=5">{$t('Top-level filesystem (ID 5)')}</option>
+			{#if !knownSelection}<option value={selected}>{$t('Custom:')} {selected}</option>{/if}
 			{#each data?.subvolumes || [] as subvolume (subvolume.id)}
 				<option value={`subvolid=${subvolume.id}`}>
-					{subvolume.path} (ID {subvolume.id}){subvolume.snapshot ? ' — snapshot' : ''}{subvolume.read_only ? ' — read-only' : ''}
+					{subvolume.path} (ID {subvolume.id}){subvolume.snapshot ? $t(' — snapshot') : ''}{subvolume.read_only ? $t(' — read-only') : ''}
 				</option>
 			{/each}
 		</select>
 	</label>
 	<button type="button" onclick={discover} disabled={disabled || busy}>
-		{busy ? 'Discovering…' : data ? 'Refresh subvolumes' : 'Discover subvolumes'}
+		{busy ? $t('Discovering…') : data ? $t('Refresh subvolumes') : $t('Discover subvolumes')}
 	</button>
-	<p class="hint">{mounted ? 'Discovery leaves your current mount unchanged. Unmount before choosing another subvolume.' : 'Discovery temporarily mounts the top level read-only, without replaying the journal, then unmounts it. Encrypted drives require unlocking.'}</p>
-	{#if data}<p class="hint">{data.subvolumes.length} subvolumes found. Read-only subvolumes are selected with RO enabled. Selections use IDs, including for paths with spaces.</p>{/if}
-	{#if error}<p class="error" role="alert">{error}</p>{/if}
+	<p class="hint">{mounted ? $t('Discovery leaves your current mount unchanged. Unmount before choosing another subvolume.') : $t('Discovery temporarily mounts the top level read-only, without replaying the journal, then unmounts it. Encrypted drives require unlocking.')}</p>
+	{#if data}<p class="hint">{$t('{count} subvolumes found. Read-only subvolumes are selected with RO enabled. Selections use IDs, including for paths with spaces.', { count: data.subvolumes.length })}</p>{/if}
+	{#if error}<p class="error" role="alert">{$t(error)}</p>{/if}
+	{#if cleanupError}<p class="error" role="alert">{$t('The temporary read-only mount could not be unmounted: {error}. Unmount it before mounting your selection.', { error: $t(cleanupError) })}</p>{/if}
 </div>
 
 {#if showUnlock}
-	<PassphraseDialog device={partition.device} description="This temporarily mounts the filesystem read-only to discover Btrfs subvolumes, then unmounts it." errorMessage={unlockError} submitting={submitting} onSubmit={unlock} onCancel={cancelUnlock} />
+	<PassphraseDialog device={partition.device} description={$t('This temporarily mounts the filesystem read-only to discover Btrfs subvolumes, then unmounts it.')} errorMessage={unlockError} submitting={submitting} onSubmit={unlock} onCancel={cancelUnlock} />
 {/if}
 
 <style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { disks } from '#lib/stores/disks';
 	import { status } from '#lib/stores/status';
 	import DiskCard from './DiskCard.svelte';
@@ -128,22 +129,22 @@
 
 <div class="disk-list">
 	<div class="header">
-		<h2>Available Disks</h2>
+		<h2>{$t('Available Disks')}</h2>
 		<div class="header-controls">
-			<label class="admin-toggle" title="Show more details (requires admin password)">
+			<label class="admin-toggle" title={$t('Show more details (requires admin password)')}>
 				<input
 					type="checkbox"
 					checked={$disks.adminMode}
 					onchange={handleAdminModeToggle}
 					disabled={$disks.loading}
 				/>
-				<span>Admin mode</span>
+				<span>{$t('Admin mode')}</span>
 			</label>
 			<button class="refresh-btn" onclick={handleRefresh} disabled={$disks.loading}>
 				{#if $disks.loading}
 					<span class="spinner"></span>
 				{:else}
-					Refresh
+					{$t('Refresh')}
 				{/if}
 			</button>
 		</div>
@@ -155,14 +156,14 @@
 			<span class="error-icon">!</span>
 			<div class="error-content">
 				<div class="error-top">
-					<span class="error-message">{summary}</span>
+					<span class="error-message">{$t(summary || '')}</span>
 					<div class="error-actions">
 						{#if details}
 							<button class="details-btn" aria-expanded={showErrorDetails} onclick={() => (showErrorDetails = !showErrorDetails)}>
-								{showErrorDetails ? 'Less' : 'Details'}
+								{showErrorDetails ? $t('Less') : $t('Details')}
 							</button>
 						{/if}
-						<button class="dismiss-btn" onclick={() => { disks.clearError(); showErrorDetails = false; }}>Dismiss</button>
+						<button class="dismiss-btn" onclick={() => { disks.clearError(); showErrorDetails = false; }}>{$t('Dismiss')}</button>
 					</div>
 				</div>
 				{#if showErrorDetails && details}
@@ -177,9 +178,9 @@
 			<span class="hint-icon">i</span>
 			<span class="hint-text">
 				{#if !$disks.hasSupportedPartitions}
-					No supported filesystems detected. Enable <strong>Admin mode</strong> for reliable filesystem detection.
+					{$t('No supported filesystems detected. Enable Admin mode for reliable filesystem detection.')}
 				{:else}
-					Enable <strong>Admin mode</strong> to reliably detect filesystems, RAID arrays, LVM volumes, and encrypted partitions.
+					{$t('Enable Admin mode to reliably detect filesystems, RAID arrays, LVM volumes, and encrypted partitions.')}
 				{/if}
 			</span>
 		</div>
@@ -188,21 +189,21 @@
 	{#if $disks.loading && $disks.disks.length === 0}
 		<div class="loading" role="status" aria-busy="true">
 			<span class="spinner large" aria-hidden="true"></span>
-			<span>Scanning disks...</span>
+			<span>{$t('Scanning disks...')}</span>
 		</div>
 	{:else if $disks.disks.length === 0}
 		<div class="empty">
-			<p>No external disks found.</p>
-			<p class="hint">Connect a drive to get started.</p>
+			<p>{$t('No external disks found.')}</p>
+			<p class="hint">{$t('Connect a drive to get started.')}</p>
 		</div>
 	{:else}
 		{#each $disks.disks as disk (disk.device)}
 			<div class="disk-group">
 				<div class="disk-header">
 					{#if disk.disk_type === 'raid'}
-						<span class="disk-label">Autodetected <span class="type-badge raid">RAID</span> volume</span>
+						<span class="disk-label">{$t('Autodetected')} <span class="type-badge raid">RAID</span> {$t('volume')}</span>
 					{:else if disk.disk_type === 'lvm'}
-						<span class="disk-label">Autodetected <span class="type-badge lvm">LVM</span> volume group</span>
+						<span class="disk-label">{$t('Autodetected')} <span class="type-badge lvm">LVM</span> {$t('volume group')}</span>
 					{:else}
 						<span class="disk-device">{disk.device}</span>
 						{#if disk.model}
@@ -215,7 +216,7 @@
 							class="eject-btn"
 							onclick={() => handleEject(disk.device)}
 							disabled={ejectingDevice === disk.device}
-							title="Eject disk (safely remove)"
+							title={$t('Eject disk (safely remove)')}
 						>
 							{#if ejectingDevice === disk.device}
 								<span class="spinner small"></span>
@@ -430,9 +431,6 @@
 		color: var(--info-text);
 	}
 
-	.hint-text strong {
-		color: var(--info-text-dark);
-	}
 
 	.loading,
 	.empty {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { selectKeyFile } from '#lib/api';
 	import { elevation } from '#lib/stores/elevation';
 	import { parseError } from '#lib/errors';
@@ -67,40 +68,40 @@
 <div class="overlay" role="dialog" aria-modal="true" tabindex="-1" onkeydown={handleKeydown}>
 	<div class="dialog">
 		<div class="dialog-header">
-			<h3>Unlock Encrypted Partition</h3>
+			<h3>{$t('Unlock Encrypted Partition')}</h3>
 		</div>
 		<div class="dialog-body">
 			<p class="device-info">
-				Choose how to unlock <code>{device}</code>.
+				{$t('Choose how to unlock {device}.', { device })}
 			</p>
 			{#if description}<p class="device-info">{description}</p>{/if}
 			{#if errorMessage}
-				<p class="passphrase-error" role="alert">{errorMessage}</p>
+				<p class="passphrase-error" role="alert">{$t(errorMessage || '')}</p>
 			{/if}
 			<form onsubmit={handleSubmit}>
-				<label for="unlock-method">Unlock method</label>
+				<label for="unlock-method">{$t('Unlock method')}</label>
 				<select id="unlock-method" bind:value={method} disabled={submitting || selecting} onchange={() => { passphrase = ''; pickerError = null; }}>
-					<option value="passphrase">Passphrase or recovery key</option>
-					<option value="key_file">Key file</option>
+					<option value="passphrase">{$t('Passphrase or recovery key')}</option>
+					<option value="key_file">{$t('Key file')}</option>
 				</select>
 				{#if method === 'key_file'}
-					<label for="key-file">Key file</label>
+					<label for="key-file">{$t('Key file')}</label>
 					<div class="input-wrapper">
-						<input id="key-file" value={keyFile} readonly placeholder="No file selected" title={keyFile} />
-						<button type="button" class="btn-secondary" onclick={chooseKeyFile} disabled={submitting || selecting}>Browse…</button>
+						<input id="key-file" value={keyFile} readonly placeholder={$t('No file selected')} title={keyFile} />
+						<button type="button" class="btn-secondary" onclick={chooseKeyFile} disabled={submitting || selecting}>{$t('Browse…')}</button>
 					</div>
 					{#if pickerError}<p class="passphrase-error" role="alert">{pickerError}</p>{/if}
 				{:else if terminalPassphrase}
-					<p>Enter the disk passphrase in Terminal after clicking Mount.</p>
+					<p>{$t('Enter the disk passphrase in Terminal after clicking Mount.')}</p>
 				{:else}
-				<label for="passphrase">Passphrase or recovery key</label>
+				<label for="passphrase">{$t('Passphrase or recovery key')}</label>
 				<div class="input-wrapper">
 					<input
 						bind:this={inputEl}
 						id="passphrase"
 						type={showPassphrase ? 'text' : 'password'}
 						bind:value={passphrase}
-						placeholder="Enter passphrase or recovery key"
+						placeholder={$t('Enter passphrase or recovery key')}
 						autocomplete="off"
 						autocorrect="off"
 						spellcheck="false"
@@ -110,22 +111,22 @@
 						type="button"
 						class="toggle-visibility"
 						onclick={() => (showPassphrase = !showPassphrase)}
-						title={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+						title={showPassphrase ? $t('Hide passphrase') : $t('Show passphrase')}
 					>
-						{showPassphrase ? 'Hide' : 'Show'}
+						{showPassphrase ? $t('Hide') : $t('Show')}
 					</button>
 				</div>
 				{/if}
 			</form>
 		</div>
 		<div class="dialog-footer">
-			<button class="btn-secondary" onclick={handleCancel} disabled={submitting || selecting}>Cancel</button>
+			<button class="btn-secondary" onclick={handleCancel} disabled={submitting || selecting}>{$t('Cancel')}</button>
 			<button
 				class="btn-primary"
 				onclick={handleSubmit}
 				disabled={!canSubmit}
 			>
-				{submitting ? 'Mounting...' : 'Mount'}
+				{submitting ? $t('Mounting...') : $t('Mount')}
 			</button>
 		</div>
 	</div>
@@ -191,13 +192,6 @@
 		border-radius: 6px;
 	}
 
-	.device-info code {
-		font-family: monospace;
-		background: var(--badge-bg);
-		padding: 2px 6px;
-		border-radius: 4px;
-		color: var(--text-primary);
-	}
 
 	label {
 		display: block;
