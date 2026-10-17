@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import ConfigPanel from '../../components/ConfigPanel.svelte';
 </script>
 
 <svelte:head>
-	<title>Settings - anylinuxfs</title>
+	<title>{$t('Settings - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="page">
