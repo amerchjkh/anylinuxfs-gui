@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { onMount } from 'svelte';
 	import { listPackages, addPackages, removePackages } from '#lib/api';
 	import { isMounted } from '#lib/stores/status';
@@ -71,25 +72,25 @@
 </script>
 
 <svelte:head>
-	<title>Packages - anylinuxfs</title>
+	<title>{$t('Packages - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="packages-page">
 	<div class="header">
-		<h2>Alpine Packages</h2>
+		<h2>{$t('Alpine Packages')}</h2>
 		<button class="btn-secondary" onclick={loadPackages} disabled={loading || $isMounted}>
-			{loading && !$isMounted ? 'Loading...' : 'Refresh'}
+			{loading && !$isMounted ? $t('Loading...') : $t('Refresh')}
 		</button>
 	</div>
 
 	{#if $isMounted}
 		<div class="mounted-banner">
-			Unmount all filesystems to manage packages.
+			{$t('Unmount all filesystems to manage packages.')}
 		</div>
 	{:else if error}
 		<div class="error-banner" role="alert">
-			<span>{error}</span>
-			<button onclick={() => (error = null)}>Dismiss</button>
+			<span>{$t(error || '')}</span>
+			<button onclick={() => (error = null)}>{$t('Dismiss')}</button>
 		</div>
 	{/if}
 
@@ -97,7 +98,7 @@
 	<div class="add-package">
 		<input
 			type="text"
-			placeholder="Package name (e.g., vim, htop, curl)"
+			placeholder={$t('Package name (e.g., vim, htop, curl)')}
 			bind:value={newPackage}
 			onkeydown={handleKeydown}
 			disabled={processing}
@@ -106,18 +107,18 @@
 			spellcheck="false"
 		/>
 		<button class="btn-primary" onclick={handleAdd} disabled={processing || !newPackage.trim()}>
-			{processing ? 'Adding...' : 'Add Package'}
+			{processing ? $t('Adding...') : $t('Add Package')}
 		</button>
 	</div>
 
 	<div class="packages-section">
-		<h3>Installed Custom Packages</h3>
+		<h3>{$t('Installed Custom Packages')}</h3>
 		{#if loading && packages.length === 0}
-			<div class="loading">Loading packages...</div>
+			<div class="loading">{$t('Loading packages...')}</div>
 		{:else if packages.length === 0}
 			<div class="empty">
-				<p>No custom packages installed.</p>
-				<p class="hint">Add packages to extend the VM's capabilities.</p>
+				<p>{$t('No custom packages installed.')}</p>
+				<p class="hint">{$t('Add packages to extend the VM\'s capabilities.')}</p>
 			</div>
 		{:else}
 			<div class="packages-list">
@@ -125,13 +126,13 @@
 					<div class="package-item">
 						<span class="package-name">{pkg}</span>
 						{#if removingPackage === pkg}
-							<span class="removing">Removing...</span>
+							<span class="removing">{$t('Removing...')}</span>
 						{:else}
 							<button
 								class="btn-remove"
 								onclick={() => handleRemove(pkg)}
 								disabled={removingPackage !== null}
-								title="Remove package"
+								title={$t('Remove package')}
 							>
 								&times;
 							</button>
@@ -144,10 +145,10 @@
 	{/if}
 
 	<div class="info-section">
-		<p>Custom packages are installed in the Alpine Linux VM and persist across mounts.</p>
-		<p>You can add multiple packages at once by separating them with spaces or commas.</p>
+		<p>{$t('Custom packages are installed in the Alpine Linux VM and persist across mounts.')}</p>
+		<p>{$t('You can add multiple packages at once by separating them with spaces or commas.')}</p>
 		<p>
-			Search for packages at
+			{$t('Search for packages at')}
 			<a href="https://pkgs.alpinelinux.org/packages" target="_blank" rel="noopener">
 				pkgs.alpinelinux.org
 			</a>
