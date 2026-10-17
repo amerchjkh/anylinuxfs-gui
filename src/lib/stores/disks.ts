@@ -136,7 +136,7 @@ function createDisksStore() {
 				const result = await mountDisk(device, passphrase, readOnly, extraOptions, ignorePermissions, keyFile);
 				if (result.outcome === 'mounted') {
 					logAction('Mount completed', { device });
-					notifyIfHidden('Mount Complete', `${device} mounted successfully.`);
+					notifyIfHidden('Mount Complete', '{device} mounted successfully.', { device });
 					return 'success';
 				}
 				if (result.outcome === 'encryption_required') {
