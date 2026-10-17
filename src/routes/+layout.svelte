@@ -1,5 +1,8 @@
 <script lang="ts">
 	import '../app.css';
+	import { initializeLanguage, locale } from '#lib/i18n';
+	import { setLocale } from '#lib/api';
+	import { logError } from '#lib/logger';
 	import Sidebar from '../components/Sidebar.svelte';
 	import { status } from '#lib/stores/status';
 	import { elevation } from '#lib/stores/elevation';
@@ -9,8 +12,14 @@
 	let { children }: { children: Snippet } = $props();
 
 	onMount(() => {
+		const stopLanguage = initializeLanguage();
+		const unsubscribeLocale = locale.subscribe((value) => {
+			document.documentElement.lang = value;
+			setLocale(value).catch((error) => logError('language.sync', error));
+		});
 		status.startListening();
 		elevation.load();
+		return () => { stopLanguage(); unsubscribeLocale(); };
 	});
 
 	onDestroy(() => {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { onMount } from 'svelte';
 	import MountStatus from '../components/MountStatus.svelte';
 	import DiskList from '../components/DiskList.svelte';
@@ -37,27 +38,27 @@
 		<div class="cli-warning">
 			<span class="warning-icon">⚠</span>
 			<div class="warning-content">
-				<strong>anylinuxfs CLI not found</strong>
-				<p>Searched in PATH and common locations.</p>
-				<p>Install it with: <code>brew install nohajc/anylinuxfs/anylinuxfs</code></p>
+				<strong>{$t('anylinuxfs CLI not found')}</strong>
+				<p>{$t('Searched in PATH and common locations.')}</p>
+				<p>{$t('Install it with:')} <code>brew install nohajc/anylinuxfs/anylinuxfs</code></p>
 			</div>
 		</div>
 	{:else if vmNotInitialized}
 		<div class="cli-warning init-warning">
 			<span class="warning-icon">i</span>
 			<div class="warning-content">
-				<strong>First run setup required</strong>
-				<p>The first mount will download the Linux VM image (~50 MB).</p>
-				<p>This may take a minute depending on your connection.</p>
+				<strong>{$t('First run setup required')}</strong>
+				<p>{$t('The first mount will download the Linux VM image (~50 MB).')}</p>
+				<p>{$t('This may take a minute depending on your connection.')}</p>
 			</div>
 		</div>
 	{:else if reinitPending}
 		<div class="cli-warning init-warning">
 			<span class="warning-icon">i</span>
 			<div class="warning-content">
-				<strong>VM image update pending</strong>
-				<p>The next operation will update the VM image.</p>
-				<p>This may take a moment.</p>
+				<strong>{$t('VM image update pending')}</strong>
+				<p>{$t('The next operation will update the VM image.')}</p>
+				<p>{$t('This may take a moment.')}</p>
 			</div>
 		</div>
 	{/if}
