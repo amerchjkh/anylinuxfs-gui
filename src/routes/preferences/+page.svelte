@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import PreferencesPanel from '../../components/PreferencesPanel.svelte';
 </script>
 
 <svelte:head>
-	<title>Preferences - anylinuxfs</title>
+	<title>{$t('Preferences - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="page">
