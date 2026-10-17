@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { onMount } from 'svelte';
 	import { listImages, installImage, uninstallImage, type VmImage } from '#lib/api';
 	import { isMounted } from '#lib/stores/status';
@@ -56,32 +57,32 @@
 </script>
 
 <svelte:head>
-	<title>Images - anylinuxfs</title>
+	<title>{$t('Images - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="images-page">
 	<div class="header">
-		<h2>VM Images</h2>
+		<h2>{$t('VM Images')}</h2>
 		<button class="btn-secondary" onclick={loadImages} disabled={loading || $isMounted}>
-			{loading && !$isMounted ? 'Loading...' : 'Refresh'}
+			{loading && !$isMounted ? $t('Loading...') : $t('Refresh')}
 		</button>
 	</div>
 
 	{#if $isMounted}
 		<div class="mounted-banner">
-			Unmount all filesystems to manage VM images.
+			{$t('Unmount all filesystems to manage VM images.')}
 		</div>
 	{:else if error}
 		<div class="error-banner" role="alert">
-			<span>{error}</span>
-			<button onclick={() => (error = null)}>Dismiss</button>
+			<span>{$t(error || '')}</span>
+			<button onclick={() => (error = null)}>{$t('Dismiss')}</button>
 		</div>
 	{/if}
 
 	{#if !$isMounted && loading && images.length === 0}
-		<div class="loading">Loading images...</div>
+		<div class="loading">{$t('Loading images...')}</div>
 	{:else if !$isMounted && images.length === 0}
-		<div class="empty">No images available.</div>
+		<div class="empty">{$t('No images available.')}</div>
 	{:else}
 		<div class="images-list">
 			{#each images as image}
@@ -89,29 +90,29 @@
 					<div class="image-info">
 						<span class="image-name">{image.name}</span>
 						{#if image.installed}
-							<span class="status-badge">Installed</span>
+							<span class="status-badge">{$t('Installed')}</span>
 						{/if}
 					</div>
 					<div class="image-actions">
 						{#if processingImage === image.name}
-							<span class="processing">Processing...</span>
+							<span class="processing">{$t('Processing...')}</span>
 						{:else if image.installed}
 							<button
 								class="btn-danger"
 								onclick={() => handleUninstall(image.name)}
 								disabled={processingImage !== null || $isMounted}
-								title={$isMounted ? 'Unmount all filesystems first' : ''}
+								title={$isMounted ? $t('Unmount all filesystems first') : ''}
 							>
-								Uninstall
+								{$t('Uninstall')}
 							</button>
 						{:else}
 							<button
 								class="btn-primary"
 								onclick={() => handleInstall(image.name)}
 								disabled={processingImage !== null || $isMounted}
-								title={$isMounted ? 'Unmount all filesystems first' : ''}
+								title={$isMounted ? $t('Unmount all filesystems first') : ''}
 							>
-								Install
+								{$t('Install')}
 							</button>
 						{/if}
 					</div>
@@ -121,9 +122,9 @@
 	{/if}
 
 	<div class="info-section">
-		<p>VM images are used by anylinuxfs to mount different filesystem types.</p>
-		<p><strong>alpine-latest</strong> - Default Linux image for ext2/3/4, btrfs, XFS, etc.</p>
-		<p><strong>freebsd-*</strong> - FreeBSD image required for ZFS support.</p>
+		<p>{$t('VM images are used by anylinuxfs to mount different filesystem types.')}</p>
+		<p><strong>alpine-latest</strong> {$t('- Default Linux image for ext2/3/4, btrfs, XFS, etc.')}</p>
+		<p><strong>freebsd-*</strong> {$t('- FreeBSD image required for ZFS support.')}</p>
 	</div>
 </div>
 
