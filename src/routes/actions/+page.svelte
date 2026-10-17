@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { onMount } from 'svelte';
 	import {
 		listCustomActions,
@@ -163,30 +164,29 @@
 </script>
 
 <svelte:head>
-	<title>Actions - anylinuxfs</title>
+	<title>{$t('Actions - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="actions-page">
 	<div class="header">
-		<h2>Custom Actions</h2>
-		<button class="btn-primary" onclick={openCreateForm}>New Action</button>
+		<h2>{$t('Custom Actions')}</h2>
+		<button class="btn-primary" onclick={openCreateForm}>{$t('New Action')}</button>
 	</div>
 
 	{#if error}
 		<div class="error-banner" role="alert">
-			<span>{error}</span>
-			<button onclick={() => (error = null)}>Dismiss</button>
+			<span>{$t(error || '')}</span>
+			<button onclick={() => (error = null)}>{$t('Dismiss')}</button>
 		</div>
 	{/if}
 
 	{#if loading && actions.length === 0}
-		<div class="loading">Loading actions...</div>
+		<div class="loading">{$t('Loading actions...')}</div>
 	{:else if actions.length === 0}
 		<div class="empty">
-			<p>No custom actions defined.</p>
+			<p>{$t('No custom actions defined.')}</p>
 			<p class="hint">
-				Custom actions let you run scripts before/after mount operations and customize the NFS
-				export.
+				{$t('Custom actions let you run scripts before/after mount operations and customize the NFS export.')}
 			</p>
 		</div>
 	{:else}
@@ -197,45 +197,45 @@
 						<div class="action-header">
 							<span class="action-name">{action.name}</span>
 							{#if action.is_upstream}
-								<span class="badge upstream-badge">Upstream (read-only)</span>
+								<span class="badge upstream-badge">{$t('Upstream (read-only)')}</span>
 							{:else}
-								<span class="badge user-badge">User</span>
+								<span class="badge user-badge">{$t('User')}</span>
 							{/if}
 						</div>
 						{#if action.description}
-							<p class="action-description">{action.description}</p>
+							<p class="action-description">{action.is_upstream ? $t(action.description) : action.description}</p>
 						{/if}
 						<div class="action-details">
 							{#if action.before_mount}
-								<span class="detail-tag">before_mount</span>
+								<span class="detail-tag">{$t('before_mount')}</span>
 							{/if}
 							{#if action.after_mount}
-								<span class="detail-tag">after_mount</span>
+								<span class="detail-tag">{$t('after_mount')}</span>
 							{/if}
 							{#if action.before_unmount}
-								<span class="detail-tag">before_unmount</span>
+								<span class="detail-tag">{$t('before_unmount')}</span>
 							{/if}
 							{#if action.environment.length > 0}
-								<span class="detail-tag">environment</span>
+								<span class="detail-tag">{$t('environment')}</span>
 							{/if}
 							{#if action.override_nfs_export}
-								<span class="detail-tag">nfs_export</span>
+								<span class="detail-tag">{$t('nfs_export')}</span>
 							{/if}
 							{#if action.required_os}
-								<span class="detail-tag">os: {action.required_os}</span>
+								<span class="detail-tag">{$t('os:')} {action.required_os}</span>
 							{/if}
 						</div>
 					</div>
 					<div class="action-actions">
 						{#if action.is_upstream}
-							<button class="btn-secondary" onclick={() => openCopyForm(action)}>Copy</button>
+							<button class="btn-secondary" onclick={() => openCopyForm(action)}>{$t('Copy')}</button>
 						{:else}
-							<button class="btn-secondary" onclick={() => openEditForm(action)}>Edit</button>
+							<button class="btn-secondary" onclick={() => openEditForm(action)}>{$t('Edit')}</button>
 							{#if deleteConfirm === action.name}
-								<button class="btn-danger" onclick={handleDelete}>Confirm</button>
-								<button class="btn-secondary" onclick={cancelDelete}>Cancel</button>
+								<button class="btn-danger" onclick={handleDelete}>{$t('Confirm')}</button>
+								<button class="btn-secondary" onclick={cancelDelete}>{$t('Cancel')}</button>
 							{:else}
-								<button class="btn-danger" onclick={() => confirmDelete(action.name)}>Delete</button>
+								<button class="btn-danger" onclick={() => confirmDelete(action.name)}>{$t('Delete')}</button>
 							{/if}
 						{/if}
 					</div>
@@ -246,15 +246,14 @@
 
 	<div class="info-section">
 		<p>
-			<strong>Custom actions</strong> allow you to run shell scripts at different stages of the mount/unmount
-			process.
+			<strong>{$t('Custom actions')}</strong> {$t('allow you to run shell scripts at different stages of the mount/unmount process.')}
 		</p>
 		<p>
-			<strong>Upstream actions</strong> are defined in <code>/opt/homebrew/etc/anylinuxfs.toml</code>
-			and cannot be modified.
+			<strong>{$t('Upstream actions')}</strong> {$t('are defined in')} <code>/opt/homebrew/etc/anylinuxfs.toml</code>
+			{$t('and cannot be modified.')}
 		</p>
 		<p>
-			<strong>User actions</strong> are stored in <code>~/.anylinuxfs/config.toml</code>.
+			<strong>{$t('User actions')}</strong> {$t('are stored in')} <code>~/.anylinuxfs/config.toml</code>.
 		</p>
 	</div>
 </div>
@@ -265,12 +264,12 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div class="modal" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="-1">
 			<div class="modal-header">
-				<h3>{editingAction ? 'Edit Action' : 'New Action'}</h3>
+				<h3>{editingAction ? $t('Edit Action') : $t('New Action')}</h3>
 				<button class="modal-close" onclick={closeForm}>&times;</button>
 			</div>
 			<form class="modal-body" onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 				<div class="form-group">
-					<label for="name">Name <span class="required">*</span></label>
+					<label for="name">{$t('Name')} <span class="required">*</span></label>
 					<input
 						type="text"
 						id="name"
@@ -282,110 +281,110 @@
 						spellcheck="false"
 					/>
 					{#if editingAction}
-						<span class="field-hint">Name cannot be changed after creation</span>
+						<span class="field-hint">{$t('Name cannot be changed after creation')}</span>
 					{/if}
 				</div>
 
 				<div class="form-group">
-					<label for="description">Description</label>
+					<label for="description">{$t('Description')}</label>
 					<input
 						type="text"
 						id="description"
 						bind:value={formDescription}
-						placeholder="Optional description of what this action does"
+						placeholder={$t('Optional description of what this action does')}
 						autocomplete="off"
 						spellcheck="false"
 					/>
 				</div>
 
 				<div class="form-group">
-					<label for="before_mount">Before Mount Script</label>
+					<label for="before_mount">{$t('Before Mount Script')}</label>
 					<textarea
 						id="before_mount"
 						bind:value={formBeforeMount}
 						rows="3"
-						placeholder="Commands to run before mounting"
+						placeholder={$t('Commands to run before mounting')}
 						autocomplete="off"
 						spellcheck="false"
 					></textarea>
 				</div>
 
 				<div class="form-group">
-					<label for="after_mount">After Mount Script</label>
+					<label for="after_mount">{$t('After Mount Script')}</label>
 					<textarea
 						id="after_mount"
 						bind:value={formAfterMount}
 						rows="3"
-						placeholder="Commands to run after mounting"
+						placeholder={$t('Commands to run after mounting')}
 						autocomplete="off"
 						spellcheck="false"
 					></textarea>
 				</div>
 
 				<div class="form-group">
-					<label for="before_unmount">Before Unmount Script</label>
+					<label for="before_unmount">{$t('Before Unmount Script')}</label>
 					<textarea
 						id="before_unmount"
 						bind:value={formBeforeUnmount}
 						rows="3"
-						placeholder="Commands to run before unmounting"
+						placeholder={$t('Commands to run before unmounting')}
 						autocomplete="off"
 						spellcheck="false"
 					></textarea>
 				</div>
 
 				<div class="form-group">
-					<label for="environment">Environment Variables</label>
+					<label for="environment">{$t('Environment Variables')}</label>
 					<textarea
 						id="environment"
 						bind:value={formEnvironment}
 						rows="2"
-						placeholder="KEY=VALUE (one per line)"
+						placeholder={$t('KEY=VALUE (one per line)')}
 						autocomplete="off"
 						spellcheck="false"
 					></textarea>
-					<span class="field-hint">Variables to pass to the mount scripts</span>
+					<span class="field-hint">{$t('Variables to pass to the mount scripts')}</span>
 				</div>
 
 				<div class="form-group">
-					<label for="capture_environment">Capture Environment</label>
+					<label for="capture_environment">{$t('Capture Environment')}</label>
 					<textarea
 						id="capture_environment"
 						bind:value={formCaptureEnvironment}
 						rows="2"
-						placeholder="VARIABLE_NAME (one per line)"
+						placeholder={$t('VARIABLE_NAME (one per line)')}
 						autocomplete="off"
 						spellcheck="false"
 					></textarea>
-					<span class="field-hint">Host environment variables to capture and pass through</span>
+					<span class="field-hint">{$t('Host environment variables to capture and pass through')}</span>
 				</div>
 
 				<div class="form-group">
-					<label for="override_nfs_export">Override NFS Export</label>
+					<label for="override_nfs_export">{$t('Override NFS Export')}</label>
 					<input
 						type="text"
 						id="override_nfs_export"
 						bind:value={formOverrideNfsExport}
-						placeholder="Custom NFS export path"
+						placeholder={$t('Custom NFS export path')}
 						autocomplete="off"
 						spellcheck="false"
 					/>
 				</div>
 
 				<div class="form-group">
-					<label for="required_os">Required OS</label>
+					<label for="required_os">{$t('Required OS')}</label>
 					<select id="required_os" bind:value={formRequiredOs}>
-						<option value="">Any</option>
+						<option value="">{$t('Any')}</option>
 						<option value="linux">Linux</option>
 						<option value="freebsd">FreeBSD</option>
 					</select>
-					<span class="field-hint">Restrict this action to a specific VM image</span>
+					<span class="field-hint">{$t('Restrict this action to a specific VM image')}</span>
 				</div>
 
 				<div class="form-actions">
-					<button type="button" class="btn-secondary" onclick={closeForm}>Cancel</button>
+					<button type="button" class="btn-secondary" onclick={closeForm}>{$t('Cancel')}</button>
 					<button type="submit" class="btn-primary" disabled={formSubmitting}>
-						{formSubmitting ? 'Saving...' : editingAction ? 'Save Changes' : 'Create Action'}
+						{formSubmitting ? $t('Saving...') : editingAction ? $t('Save Changes') : $t('Create Action')}
 					</button>
 				</div>
 			</form>
