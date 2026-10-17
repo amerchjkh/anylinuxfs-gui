@@ -175,3 +175,8 @@ export async function deleteCustomAction(name: string): Promise<void> {
 export async function setTrayUnmountEnabled(enabled: boolean): Promise<void> {
 	return await invoke<void>('set_tray_unmount_enabled', { enabled });
 }
+
+// Presentation language only; this does not change the privilege policy or CLI protocol.
+export async function setLocale(locale: import('./i18n/core').Locale): Promise<void> {
+	return invoke('set_locale', { locale });
+}

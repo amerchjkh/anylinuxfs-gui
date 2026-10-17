@@ -1,3 +1,5 @@
+import { get } from 'svelte/store';
+import { t } from './i18n';
 import { trace, debug, info, warn, error } from '@tauri-apps/plugin-log';
 import { isPermissionGranted, sendNotification } from '@tauri-apps/plugin-notification';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -12,13 +14,13 @@ export function logError(context: string, err: unknown): void {
 }
 
 // Send a notification when the window is hidden (tray mode)
-export async function notifyIfHidden(title: string, body: string): Promise<void> {
+export async function notifyIfHidden(title: string, body: string, parameters?: import('./i18n/core').Parameters): Promise<void> {
 	try {
 		const visible = await getCurrentWindow().isVisible();
 		if (visible) return;
 		const granted = await isPermissionGranted();
 		if (granted) {
-			sendNotification({ title, body });
+			sendNotification({ title: get(t)(title), body: get(t)(body, parameters) });
 		}
 	} catch {
 		// Silently ignore notification failures
