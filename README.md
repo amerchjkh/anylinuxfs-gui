@@ -22,6 +22,11 @@ A macOS GUI application for [anylinuxfs](https://github.com/nohajc/anylinuxfs) -
 - **Force Cleanup** - Detect and clean up orphaned VM instances from failed mounts
 - **Auto-refresh** - Disk list updates automatically when drives are connected/ejected
 - **Native macOS** - Light/dark mode support, Apple Silicon optimized
+- **Languages** - English and Simplified Chinese, with system detection and an instant language switch in Preferences
+
+## Language
+
+Choose **Follow system**, **English**, or **简体中文** in **Preferences → Language**. The choice is remembered and updates the interface and application menus immediately. Unsupported system languages fall back to English. See [localization notes](docs/localization.md) for translation and testing details.
 
 ## Installation
 
