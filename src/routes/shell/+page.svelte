@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n';
 	import { onMount, onDestroy } from 'svelte';
 	import { Terminal } from '@xterm/xterm';
 	import { FitAddon } from '@xterm/addon-fit';
@@ -41,6 +42,12 @@
 			console.error('Failed to load images:', e);
 		}
 	}
+
+	$effect(() => {
+		Terminal.strings.promptLabel = $t('Terminal input');
+		terminal?.textarea?.setAttribute('aria-label', $t('Terminal input'));
+		Terminal.strings.tooMuchOutput = $t('Too much output to announce, navigate to rows manually to read');
+	});
 
 	onMount(() => {
 		terminal = new Terminal({
@@ -104,7 +111,7 @@
 			unlistenExit = await listen(Events.SHELL_EXIT, () => {
 				running = false;
 				logAction('Shell exited');
-				terminal?.writeln('\r\n\x1b[33m[Shell exited. Click "Start Shell" to reconnect.]\x1b[0m');
+				terminal?.writeln($t('\r\n\x1b[33m[Shell exited. Click "Start Shell" to reconnect.]\x1b[0m'));
 			});
 
 			await checkMountStatus();
@@ -131,14 +138,14 @@
 		// Recheck mount status before starting
 		await checkMountStatus();
 		if (isMounted) {
-			terminal?.writeln('\x1b[33mCannot start shell while a filesystem is mounted.\x1b[0m\r\n');
-			terminal?.writeln('\x1b[33mPlease unmount first from the Disks page.\x1b[0m\r\n');
+			terminal?.writeln($t('\x1b[33mCannot start shell while a filesystem is mounted.\x1b[0m\r\n'));
+			terminal?.writeln($t('\x1b[33mPlease unmount first from the Disks page.\x1b[0m\r\n'));
 			return;
 		}
 
 		error = null;
 		terminal?.clear();
-		terminal?.writeln(`Starting ${selectedImage} shell...\r\n`);
+		terminal?.writeln($t('Starting {image} shell...', { image: selectedImage }) + '\r\n');
 
 		try {
 			logAction('Shell starting', { image: selectedImage });
@@ -152,7 +159,7 @@
 		} catch (e) {
 			logError('shell.start', e);
 			error = parseError(e).message;
-			terminal?.writeln(`\x1b[31mError: ${error}\x1b[0m\r\n`);
+			terminal?.writeln('\x1b[31m' + $t('Error: {error}', { error: $t(error || '') }) + '\x1b[0m\r\n');
 		}
 	}
 
@@ -164,7 +171,7 @@
 			await stopShell();
 			running = false;
 			logAction('Shell stopped');
-			terminal?.writeln('\r\n\x1b[33m[Shell stopped.]\x1b[0m');
+			terminal?.writeln($t('\r\n\x1b[33m[Shell stopped.]\x1b[0m'));
 		} catch (e) {
 			logError('shell.stop', e);
 		}
@@ -172,12 +179,12 @@
 </script>
 
 <svelte:head>
-	<title>Shell - anylinuxfs</title>
+	<title>{$t('Shell - anylinuxfs')}</title>
 </svelte:head>
 
 <div class="shell-page">
 	<div class="header">
-		<h2>VM Shell</h2>
+		<h2>{$t('VM Shell')}</h2>
 		<div class="actions">
 			{#if isMounted}
 				<!-- controls hidden when mounted -->
@@ -187,27 +194,27 @@
 						<option value={image.name}>{image.name}</option>
 					{/each}
 					{#if installedImages.length === 0}
-						<option value="">No images installed</option>
+						<option value="">{$t('No images installed')}</option>
 					{/if}
 				</select>
-				<button class="btn-primary" onclick={handleStart} disabled={installedImages.length === 0}>Start Shell</button>
+				<button class="btn-primary" onclick={handleStart} disabled={installedImages.length === 0}>{$t('Start Shell')}</button>
 			{:else}
-				<span class="status-badge">Connected</span>
-				<button class="btn-secondary" onclick={handleStop}>Stop</button>
+				<span class="status-badge">{$t('Connected')}</span>
+				<button class="btn-secondary" onclick={handleStop}>{$t('Stop')}</button>
 			{/if}
 		</div>
 	</div>
 
 	{#if isMounted}
 		<div class="mounted-banner">
-			Unmount all filesystems to use the shell.
+			{$t('Unmount all filesystems to use the shell.')}
 		</div>
 	{/if}
 
 	{#if error}
 		<div class="error-banner" role="alert">
-			<span>{error}</span>
-			<button onclick={() => (error = null)}>Dismiss</button>
+			<span>{$t(error || '')}</span>
+			<button onclick={() => (error = null)}>{$t('Dismiss')}</button>
 		</div>
 	{/if}
 
