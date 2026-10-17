@@ -473,8 +473,8 @@ release_start_gate
     };
 
     format!(
-        "{}{}finish_terminal \"$command_status\"\ntrap - HUP INT TERM\n/usr/bin/printf '\\nanylinuxfs finished with status %s. This Terminal tab can be closed.\\n' \"$command_status\"\nexit \"$command_status\"\n",
-        prelude, command
+        "{}{}finish_terminal \"$command_status\"\ntrap - HUP INT TERM\n/usr/bin/printf '\\n{}\\n' \"$command_status\"\nexit \"$command_status\"\n",
+        prelude, command, crate::localization::current_locale().text("anylinuxfs finished with status %s. This Terminal tab can be closed.", "anylinuxfs 已结束，退出状态为 %s。可以关闭此终端标签页。")
     )
 }
 

@@ -452,9 +452,7 @@ fn create_askpass_script() -> Result<String, String> {
 
     // Create askpass script that uses osascript to prompt for password
     // The password goes directly from osascript to sudo, never through our app
-    let script_content = r#"#!/bin/bash
-osascript -e 'Tell application "System Events" to display dialog "anylinuxfs requires administrator privileges." & return & return & "Enter your password:" with hidden answer default answer "" buttons {"Cancel", "OK"} default button "OK" with title "Authentication Required" with icon caution' -e 'text returned of result' 2>/dev/null
-"#;
+    let script_content = crate::localization::authentication_script(crate::localization::current_locale());
 
     // Use tempfile for a cryptographically random filename, preventing symlink attacks
     let mut file = tempfile::Builder::new()

@@ -4,6 +4,9 @@ mod commands;
 mod elevation;
 mod error;
 mod paths;
+mod localization;
+
+use localization::{current_locale, set_locale, NativeMenus};
 
 pub use error::{AppError, AppResult};
 pub use paths::{get_socket_path, get_log_path, get_log_paths, get_log_dir, COMMAND_TIMEOUT_SECS, MOUNT_TIMEOUT_SECS};
@@ -11,7 +14,7 @@ pub use paths::{get_socket_path, get_log_path, get_log_paths, get_log_dir, COMMA
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
 use tauri::tray::TrayIconBuilder;
-use tauri::menu::{MenuBuilder, MenuItemBuilder, AboutMetadataBuilder, SubmenuBuilder};
+use tauri::menu::{MenuBuilder, MenuItemBuilder, AboutMetadataBuilder, SubmenuBuilder, PredefinedMenuItem};
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use elevation::{
@@ -67,12 +70,13 @@ fn confirm_quit(app: &tauri::AppHandle) {
         .unwrap_or(false);
 
         if has_mounts {
+            let locale = current_locale();
             let app_clone = app.clone();
             app.dialog()
-                .message("Filesystems are currently mounted. Quitting will NOT unmount them automatically.\n\nAre you sure you want to quit?")
-                .title("Confirm Quit")
+                .message(locale.text("Filesystems are currently mounted. Quitting will NOT unmount them automatically.\n\nAre you sure you want to quit?", "当前仍有文件系统处于挂载状态，退出程序不会自动卸载它们。\n\n确定要退出吗？"))
+                .title(locale.text("Confirm Quit", "确认退出"))
                 .kind(MessageDialogKind::Warning)
-                .buttons(MessageDialogButtons::OkCancelCustom("Quit".into(), "Cancel".into()))
+                .buttons(MessageDialogButtons::OkCancelCustom(locale.text("Quit", "退出").into(), locale.text("Cancel", "取消").into()))
                 .show(move |confirmed| {
                     if confirmed {
                         cancel_pending_elevation(&app_clone);
@@ -176,28 +180,39 @@ pub fn run() {
             let app_quit_item = MenuItemBuilder::with_id("app_quit", "Quit anylinuxfs")
                 .accelerator("CmdOrCtrl+Q")
                 .build(app)?;
+            let about_item = PredefinedMenuItem::about(app, Some("About anylinuxfs"), Some(AboutMetadataBuilder::new().build()))?;
+            let hide_item = PredefinedMenuItem::hide(app, Some("Hide anylinuxfs"))?;
+            let hide_others_item = PredefinedMenuItem::hide_others(app, Some("Hide Others"))?;
+            let show_all_item = PredefinedMenuItem::show_all(app, Some("Show All"))?;
+            let close_window_item = PredefinedMenuItem::close_window(app, Some("Close Window"))?;
+            let undo_item = PredefinedMenuItem::undo(app, Some("Undo"))?;
+            let redo_item = PredefinedMenuItem::redo(app, Some("Redo"))?;
+            let cut_item = PredefinedMenuItem::cut(app, Some("Cut"))?;
+            let copy_item = PredefinedMenuItem::copy(app, Some("Copy"))?;
+            let paste_item = PredefinedMenuItem::paste(app, Some("Paste"))?;
+            let select_all_item = PredefinedMenuItem::select_all(app, Some("Select All"))?;
             let app_menu = SubmenuBuilder::new(app, "anylinuxfs")
-                .about(Some(AboutMetadataBuilder::new().build()))
+                .item(&about_item)
                 .separator()
-                .hide()
-                .hide_others()
-                .show_all()
+                .item(&hide_item)
+                .item(&hide_others_item)
+                .item(&show_all_item)
                 .separator()
                 .item(&app_quit_item)
                 .build()?;
             let file_menu = SubmenuBuilder::new(app, "File")
-                .close_window()
+                .item(&close_window_item)
                 .build()?;
             // WKWebView uses native editing actions for shortcuts such as Cmd+V.
             // Keep these standard actions available, including in password inputs.
             let edit_menu = SubmenuBuilder::new(app, "Edit")
-                .undo()
-                .redo()
+                .item(&undo_item)
+                .item(&redo_item)
                 .separator()
-                .cut()
-                .copy()
-                .paste()
-                .select_all()
+                .item(&cut_item)
+                .item(&copy_item)
+                .item(&paste_item)
+                .item(&select_all_item)
                 .build()?;
             let menu = MenuBuilder::new(app)
                 .item(&app_menu)
@@ -205,6 +220,29 @@ pub fn run() {
                 .item(&edit_menu)
                 .build()?;
             app.set_menu(menu)?;
+            app.manage(NativeMenus {
+                items: vec![
+                    (show_item, "Show", "显示主窗口"),
+                    (unmount_item, "Unmount", "卸载"),
+                    (quit_item, "Quit", "退出"),
+                    (app_quit_item, "Quit anylinuxfs", "退出 anylinuxfs"),
+                ],
+                predefined: vec![
+                    (about_item, "About anylinuxfs", "关于 anylinuxfs"),
+                    (hide_item, "Hide anylinuxfs", "隐藏 anylinuxfs"),
+                    (hide_others_item, "Hide Others", "隐藏其他应用"),
+                    (show_all_item, "Show All", "显示全部"),
+                    (close_window_item, "Close Window", "关闭窗口"),
+                    (undo_item, "Undo", "撤销"),
+                    (redo_item, "Redo", "重做"),
+                    (cut_item, "Cut", "剪切"),
+                    (copy_item, "Copy", "复制"),
+                    (paste_item, "Paste", "粘贴"),
+                    (select_all_item, "Select All", "全选"),
+                ],
+                submenus: vec![(file_menu, "File", "文件"), (edit_menu, "Edit", "编辑")],
+            });
+
             app.on_menu_event(move |app, event| {
                 match event.id().as_ref() {
                     "close" => {
@@ -280,6 +318,7 @@ pub fn run() {
             update_custom_action,
             delete_custom_action,
             set_tray_unmount_enabled,
+            set_locale,
             get_elevation_policy,
             set_elevation_mode,
             cancel_elevation_operation,
