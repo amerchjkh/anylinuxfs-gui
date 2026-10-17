@@ -593,7 +593,7 @@ impl MountCommandResult {
 #[tauri::command]
 pub async fn select_key_file(app: AppHandle) -> Result<Option<String>, String> {
     tokio::task::spawn_blocking(move || {
-        app.dialog().file().set_title("Select encryption key file").blocking_pick_file()
+        app.dialog().file().set_title(crate::localization::current_locale().text("Select encryption key file", "选择加密密钥文件")).blocking_pick_file()
             .map(|file| {
                 let path = file.into_path().map_err(|_| "Select a local key file".to_string())?;
                 path.to_str().map(str::to_owned)
